@@ -18,9 +18,12 @@ class Api:
         except Exception as e:
             return []
 
-    def start_migration(self, source_id: str, target_id: str):
+    def start_migration(self, source_id: str, target_id: str, options: dict = None):
         """Executes the migration process."""
         try:
+            if options is None:
+                options = {"passwords": True, "cookies": True, "bookmarks": True}
+                
             source_browser = next((b for b in self.browsers if b.id == source_id), None)
             target_browser = next((b for b in self.browsers if b.id == target_id), None)
             
@@ -36,7 +39,8 @@ class Api:
             orchestrator = MigrationOrchestrator()
             success = orchestrator.migrate(
                 source_id, source_profile.path, 
-                target_id, target_profile.path
+                target_id, target_profile.path,
+                options
             )
             
             if success:

@@ -27,8 +27,11 @@ class MigrationOrchestrator:
         # Fallback to ChromeAdapter for everything right now, to unblock development
         return adapters.get(browser_id, ChromeAdapter())
 
-    def migrate(self, source_id: str, source_path: Path, target_id: str, target_path: Path) -> bool:
+    def migrate(self, source_id: str, source_path: Path, target_id: str, target_path: Path, options: dict = None) -> bool:
         cpm_logger.info(f"Starting migration from {source_id} to {target_id}")
+        
+        if options is None:
+            options = {"passwords": True, "cookies": True, "bookmarks": True}
         
         # 1. Backup Target Profile
         backup_file = self.backup_manager.create_backup(str(target_path))
@@ -50,6 +53,14 @@ class MigrationOrchestrator:
             source_adapter = self._get_adapter(source_id)
             reader = ChromiumReader(source_path, source_adapter)
             snapshot = reader.read_profile()
+            
+            # Lọc snapshot theo options
+            if not options.get("passwords", True):
+                snapshot.passwords = []
+            if not options.get("cookies", True):
+                snapshot.cookies = []
+            if not options.get("bookmarks", True):
+                snapshot.bookmarks = []
             
             # 4. Re-encrypt Sensitive Data
             cpm_logger.info("Re-encrypting passwords and cookies...")

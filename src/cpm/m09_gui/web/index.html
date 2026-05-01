@@ -16,7 +16,7 @@
 
     <div class="app-container">
         <header>
-            <h1>CPM <span>Migrator</span></h1>
+            <h1>Chromium Browser <span>Migrator</span></h1>
             <p>Seamlessly transfer your browsing life.</p>
         </header>
 
@@ -44,6 +44,42 @@
                             <option value="">Scanning browsers...</option>
                         </select>
                     </div>
+                </div>
+            </div>
+
+            <div class="glass-card options-area">
+                <h3>Select Data to Migrate</h3>
+                <div class="options-grid">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="opt-passwords" checked>
+                        <span class="slider"></span>
+                        <span class="label-text">Passwords</span>
+                    </label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="opt-cookies" checked>
+                        <span class="slider"></span>
+                        <span class="label-text">Cookies</span>
+                    </label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="opt-bookmarks" checked>
+                        <span class="slider"></span>
+                        <span class="label-text">Bookmarks</span>
+                    </label>
+                    <label class="toggle-switch disabled">
+                        <input type="checkbox" id="opt-history" disabled>
+                        <span class="slider"></span>
+                        <span class="label-text">History <span class="badge">Soon</span></span>
+                    </label>
+                    <label class="toggle-switch disabled">
+                        <input type="checkbox" id="opt-autofill" disabled>
+                        <span class="slider"></span>
+                        <span class="label-text">Auto Fill <span class="badge">Soon</span></span>
+                    </label>
+                    <label class="toggle-switch disabled">
+                        <input type="checkbox" id="opt-extensions" disabled>
+                        <span class="slider"></span>
+                        <span class="label-text">Extensions <span class="badge">Soon</span></span>
+                    </label>
                 </div>
             </div>
 

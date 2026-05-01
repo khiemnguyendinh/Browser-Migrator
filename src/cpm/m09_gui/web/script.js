@@ -83,7 +83,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 log("Please check if macOS prompts for Keychain password. You must click 'Allow'.", 'info');
 
                 try {
-                    const result = await window.pywebview.api.start_migration(sourceSelect.value, targetSelect.value);
+                    // Collect options
+                    const options = {
+                        passwords: document.getElementById('opt-passwords').checked,
+                        cookies: document.getElementById('opt-cookies').checked,
+                        bookmarks: document.getElementById('opt-bookmarks').checked
+                    };
+                    
+                    const result = await window.pywebview.api.start_migration(sourceSelect.value, targetSelect.value, options);
                     if (result.success) {
                         log(result.message, 'success');
                         btnText.textContent = "Migration Complete!";
