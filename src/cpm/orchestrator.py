@@ -80,6 +80,23 @@ class MigrationOrchestrator:
             writer = ChromiumWriter(target_path, target_adapter)
             success = writer.write_profile(snapshot)
             
+            # 6. Sao chép History và Auto Fill (Web Data) trực tiếp dạng file
+            import shutil
+            
+            if options.get("history", True):
+                cpm_logger.info("Migrating History...")
+                src_history = source_path / "History"
+                tgt_history = target_path / "History"
+                if src_history.exists():
+                    shutil.copy2(src_history, tgt_history)
+                    
+            if options.get("autofill", True):
+                cpm_logger.info("Migrating Auto Fill (Web Data)...")
+                src_webdata = source_path / "Web Data"
+                tgt_webdata = target_path / "Web Data"
+                if src_webdata.exists():
+                    shutil.copy2(src_webdata, tgt_webdata)
+            
             if success:
                 cpm_logger.info("Migration completed successfully.")
                 return True

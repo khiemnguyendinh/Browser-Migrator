@@ -87,7 +87,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const options = {
                         passwords: document.getElementById('opt-passwords').checked,
                         cookies: document.getElementById('opt-cookies').checked,
-                        bookmarks: document.getElementById('opt-bookmarks').checked
+                        bookmarks: document.getElementById('opt-bookmarks').checked,
+                        history: document.getElementById('opt-history').checked,
+                        autofill: document.getElementById('opt-autofill').checked
                     };
                     
                     const result = await window.pywebview.api.start_migration(sourceSelect.value, targetSelect.value, options);

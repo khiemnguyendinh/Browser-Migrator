@@ -6,6 +6,7 @@ Requires-Python: >=3.11
 Requires-Dist: click>=8.1.7
 Requires-Dist: rich>=13.7.0
 Requires-Dist: cryptography>=42.0.5
+Requires-Dist: pywebview>=5.0.0
 Provides-Extra: dev
 Requires-Dist: pytest>=8.0.0; extra == "dev"
 Requires-Dist: pytest-cov>=4.1.0; extra == "dev"

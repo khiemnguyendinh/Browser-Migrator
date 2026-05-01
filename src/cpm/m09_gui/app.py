@@ -22,7 +22,7 @@ class Api:
         """Executes the migration process."""
         try:
             if options is None:
-                options = {"passwords": True, "cookies": True, "bookmarks": True}
+                options = {"passwords": True, "cookies": True, "bookmarks": True, "history": True, "autofill": True}
                 
             source_browser = next((b for b in self.browsers if b.id == source_id), None)
             target_browser = next((b for b in self.browsers if b.id == target_id), None)
