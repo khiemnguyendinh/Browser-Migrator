@@ -1,8 +1,8 @@
 import unittest
-from src.cpm.m04_transformer.adapters.edge import EdgeAdapter
-from src.cpm.m04_transformer.adapters.brave import BraveAdapter
-from src.cpm.m04_transformer.adapters.coccoc import CocCocAdapter
-from src.cpm.m04_transformer.adapters.comet import CometAdapter
+from cpm.m04_transformer.adapters.edge import EdgeAdapter
+from cpm.m04_transformer.adapters.brave import BraveAdapter
+from cpm.m04_transformer.adapters.coccoc import CocCocAdapter
+from cpm.m04_transformer.adapters.comet import CometAdapter
 
 class TestSimpleAdapters(unittest.TestCase):
     def test_edge_adapter(self):

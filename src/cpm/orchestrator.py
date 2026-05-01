@@ -4,10 +4,10 @@ from cpm.m08_logger.logger import cpm_logger
 from cpm.m07_backup.backup import BackupManager
 from cpm.m03_keychain.crypto import get_crypto_context, reencrypt_value, clear_context
 from cpm.m04_transformer.adapters.chrome import ChromeAdapter
-# from cpm.m04_transformer.adapters.edge import EdgeAdapter
-# from cpm.m04_transformer.adapters.brave import BraveAdapter
-# from cpm.m04_transformer.adapters.coccoc import CocCocAdapter
-# from cpm.m04_transformer.adapters.comet import CometAdapter
+from cpm.m04_transformer.adapters.edge import EdgeAdapter
+from cpm.m04_transformer.adapters.brave import BraveAdapter
+from cpm.m04_transformer.adapters.coccoc import CocCocAdapter
+from cpm.m04_transformer.adapters.comet import CometAdapter
 from cpm.m02_reader.chromium_reader import ChromiumReader
 from cpm.m05_writer.chromium_writer import ChromiumWriter
 
@@ -19,6 +19,10 @@ class MigrationOrchestrator:
         # Temporary map until OpenCode finishes other adapters
         adapters = {
             "chrome": ChromeAdapter(),
+            "edge": EdgeAdapter(),
+            "brave": BraveAdapter(),
+            "coccoc": CocCocAdapter(),
+            "comet": CometAdapter()
         }
         # Fallback to ChromeAdapter for everything right now, to unblock development
         return adapters.get(browser_id, ChromeAdapter())
