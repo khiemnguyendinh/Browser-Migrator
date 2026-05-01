@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chromium Profile Migrator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="app-container">
+        <header>
+            <h1>CPM <span>Migrator</span></h1>
+            <p>Seamlessly transfer your browsing life.</p>
+        </header>
+
+        <main>
+            <div class="glass-card selection-area">
+                <div class="browser-select">
+                    <label for="source-browser">Source Browser</label>
+                    <div class="select-wrapper">
+                        <select id="source-browser" disabled>
+                            <option value="">Scanning browsers...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="transfer-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </div>
+
+                <div class="browser-select">
+                    <label for="target-browser">Target Browser</label>
+                    <div class="select-wrapper">
+                        <select id="target-browser" disabled>
+                            <option value="">Scanning browsers...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button id="migrate-btn" class="primary-btn glass-btn" disabled>
+                <span class="btn-text">Start Migration</span>
+                <div class="loader hidden"></div>
+            </button>
+
+            <div id="status-console" class="glass-card status-console hidden">
+                <h3>Migration Status</h3>
+                <div id="log-messages" class="log-messages"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

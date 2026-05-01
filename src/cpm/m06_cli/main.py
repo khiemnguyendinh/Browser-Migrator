@@ -60,5 +60,15 @@ def migrate(source, target):
     else:
         click.echo("Migrate thất bại. Vui lòng kiểm tra log.")
 
+@cli.command()
+def gui():
+    """Mở giao diện đồ họa (GUI) của ứng dụng."""
+    try:
+        from cpm.m09_gui.app import start_gui
+        click.echo("Đang khởi động giao diện đồ họa...")
+        start_gui()
+    except ImportError as e:
+        click.echo(f"Lỗi: Không thể khởi động GUI. Hãy chắc chắn bạn đã cài đặt pywebview. Chi tiết: {e}")
+
 if __name__ == "__main__":
     cli()
