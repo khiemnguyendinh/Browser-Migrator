@@ -2,6 +2,7 @@ from typing import Dict, Any
 from cpm.m04_transformer.base import BaseBrowserAdapter
 from cpm.core.dataclasses import BookmarkItem
 
+
 class EdgeAdapter(BaseBrowserAdapter):
     @property
     def browser_id(self) -> str:

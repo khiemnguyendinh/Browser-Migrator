@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import List
 from .models import BrowserInfo, ProfileInfo
 
 # Các path chuẩn trên macOS cho trình duyệt Chromium
@@ -39,6 +39,7 @@ BROWSER_PATHS = {
     },
 }
 
+
 class BrowserDetector:
     """M01 - Phát hiện và đọc danh sách trình duyệt, profile trên macOS."""
 
@@ -66,7 +67,7 @@ class BrowserDetector:
         """Đọc file Local State để lấy danh sách profiles."""
         profiles = []
         local_state_path = base_path / "Local State"
-        
+
         if not local_state_path.exists():
             # Nếu không có Local State, thử fallback bằng cách đọc folder Default
             default_path = base_path / "Default"
@@ -77,26 +78,26 @@ class BrowserDetector:
         try:
             with open(local_state_path, "r", encoding="utf-8") as f:
                 state = json.load(f)
-            
+
             profile_info_cache = state.get("profile", {}).get("info_cache", {})
             last_used = state.get("profile", {}).get("last_used", "")
-            
+
             for profile_dir_name, info in profile_info_cache.items():
                 profile_path = base_path / profile_dir_name
                 if profile_path.exists() and profile_path.is_dir():
                     profile_name = info.get("name", profile_dir_name)
-                    is_default = (profile_dir_name == last_used) if last_used else (profile_dir_name == "Default")
+                    is_default = (
+                        (profile_dir_name == last_used)
+                        if last_used
+                        else (profile_dir_name == "Default")
+                    )
                     profiles.append(
-                        ProfileInfo(
-                            name=profile_name,
-                            path=profile_path,
-                            is_default=is_default
-                        )
+                        ProfileInfo(name=profile_name, path=profile_path, is_default=is_default)
                     )
         except Exception:
             # Fallback nếu lỗi đọc json
             default_path = base_path / "Default"
             if default_path.exists() and default_path.is_dir():
                 profiles.append(ProfileInfo(name="Default", path=default_path, is_default=True))
-                
+
         return profiles

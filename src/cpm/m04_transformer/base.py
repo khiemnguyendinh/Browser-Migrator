@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any
-from cpm.core.dataclasses import ProfileSnapshot, BookmarkItem, CookieItem, PasswordItem
+from cpm.core.dataclasses import BookmarkItem, CookieItem, PasswordItem
+
 
 class BaseBrowserAdapter(ABC):
     """
     Adapter base class for data transformation between specific browsers and the unified model.
     """
-    
+
     @property
     @abstractmethod
     def browser_id(self) -> str:
@@ -35,7 +36,7 @@ class BaseBrowserAdapter(ABC):
             is_httponly=bool(raw_row.get("is_httponly", 0)),
             has_expires=bool(raw_row.get("has_expires", 0)),
             is_persistent=bool(raw_row.get("is_persistent", 0)),
-            samesite=raw_row.get("samesite", -1)
+            samesite=raw_row.get("samesite", -1),
         )
 
     def transform_password(self, raw_row: dict) -> PasswordItem:
@@ -48,5 +49,5 @@ class BaseBrowserAdapter(ABC):
             password_element=raw_row.get("password_element", ""),
             encrypted_password=raw_row.get("password_value", b""),
             date_created=raw_row.get("date_created", 0),
-            times_used=raw_row.get("times_used", 0)
+            times_used=raw_row.get("times_used", 0),
         )

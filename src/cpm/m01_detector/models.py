@@ -2,11 +2,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
 
+
 @dataclass
 class ProfileInfo:
     name: str
     path: Path
     is_default: bool
+
 
 @dataclass
 class BrowserInfo:

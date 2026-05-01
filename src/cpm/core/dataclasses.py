@@ -1,13 +1,15 @@
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional
 
+
 @dataclass
 class BookmarkItem:
     id: str
     name: str
     url: Optional[str] = None
-    type: str = "url" # "url" or "folder"
-    children: List['BookmarkItem'] = field(default_factory=list)
+    type: str = "url"  # "url" or "folder"
+    children: List["BookmarkItem"] = field(default_factory=list)
+
 
 @dataclass
 class CookieItem:
@@ -22,6 +24,7 @@ class CookieItem:
     is_persistent: bool
     samesite: int
 
+
 @dataclass
 class PasswordItem:
     origin_url: str
@@ -32,6 +35,7 @@ class PasswordItem:
     encrypted_password: bytes
     date_created: int
     times_used: int
+
 
 @dataclass
 class ProfileSnapshot:

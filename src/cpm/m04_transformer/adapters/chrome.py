@@ -1,7 +1,7 @@
 from typing import Dict, Any, List
 from cpm.m04_transformer.base import BaseBrowserAdapter
 from cpm.core.dataclasses import BookmarkItem
-from cpm.m08_logger.logger import cpm_logger
+
 
 class ChromeAdapter(BaseBrowserAdapter):
     @property
@@ -13,13 +13,13 @@ class ChromeAdapter(BaseBrowserAdapter):
             id=node.get("id", ""),
             name=node.get("name", ""),
             type=node.get("type", "url"),
-            url=node.get("url")
+            url=node.get("url"),
         )
-        
+
         if "children" in node:
             for child in node["children"]:
                 item.children.append(self._parse_bookmark_node(child))
-                
+
         return item
 
     def transform_bookmarks(self, raw_bookmarks: Dict[str, Any]) -> List[BookmarkItem]:
@@ -32,17 +32,17 @@ class ChromeAdapter(BaseBrowserAdapter):
         return result
 
     def _export_bookmark_node(self, item: BookmarkItem) -> Dict[str, Any]:
-        node = {
+        node: Dict[str, Any] = {
             "id": item.id,
             "name": item.name,
             "type": item.type,
         }
         if item.url:
             node["url"] = item.url
-            
+
         if item.children:
             node["children"] = [self._export_bookmark_node(child) for child in item.children]
-            
+
         return node
 
     def export_bookmarks(self, standardized_bookmarks: List[BookmarkItem]) -> Dict[str, Any]:
@@ -56,11 +56,7 @@ class ChromeAdapter(BaseBrowserAdapter):
                 root_key = "bookmark_bar"
             elif "sync" in name_lower:
                 root_key = "synced"
-            
+
             roots[root_key] = self._export_bookmark_node(item)
-            
-        return {
-            "version": 1,
-            "checksum": "placeholder",
-            "roots": roots
-        }
+
+        return {"version": 1, "checksum": "placeholder", "roots": roots}
