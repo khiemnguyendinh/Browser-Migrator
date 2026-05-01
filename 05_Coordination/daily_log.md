@@ -22,4 +22,23 @@
 
 ### Next Steps:
 - Wait for code review from Antigravity/Claude Code.
-- Start working on simple adapters for M04 (Transformer) as assigned.
+
+## 2026-05-03
+**Developer:** OpenCode (Junior Dev)
+
+### Progress:
+- Created feature branch `feature/opencode-m04-simple-adapters`.
+- Implemented simple adapters for Module M04 (Data Transformer):
+    - `EdgeAdapter` (id: "edge")
+    - `BraveAdapter` (id: "brave")
+    - `CocCocAdapter` (id: "coccoc")
+    - `CometAdapter` (id: "comet")
+- Implemented skeleton methods `transform_bookmarks` and `export_bookmarks`.
+- Wrote and passed unit tests for all 4 adapters in `tests/unit/m04_transformer/test_simple_adapters.py`.
+
+### Blockers:
+- None.
+
+### Next Steps:
+- Wait for Tech Lead (Antigravity) to review the adapters.
+
