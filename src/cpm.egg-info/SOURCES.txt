@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+src/cpm/__init__.py
+src/cpm.egg-info/PKG-INFO
+src/cpm.egg-info/SOURCES.txt
+src/cpm.egg-info/dependency_links.txt
+src/cpm.egg-info/entry_points.txt
+src/cpm.egg-info/requires.txt
+src/cpm.egg-info/top_level.txt

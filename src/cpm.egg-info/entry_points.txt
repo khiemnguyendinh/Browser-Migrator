@@ -1,0 +1,2 @@
+[console_scripts]
+cpm = cpm.m06_cli.main:cli
