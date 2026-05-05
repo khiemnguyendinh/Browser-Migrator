@@ -10,6 +10,9 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
 
     steps:
       - name: Checkout code
@@ -24,12 +27,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .[dev]
+          pip install ".[dev]"
           pip install pywin32
 
       - name: Run tests
         run: |
-          set PYTHONPATH=src
+          $env:PYTHONPATH = "src"
           pytest tests/ -v --tb=short
         env:
           CPM_TEST_MODE: "1"
@@ -37,12 +40,16 @@ jobs:
 
       - name: Build Windows EXE
         run: |
-          python -m PyInstaller --clean --noconfirm ^
-            --noconsole ^
-            --onefile ^
-            --name=ChromiumBrowserMigrator ^
-            --add-data="src/cpm/m09_gui/web;cpm/m09_gui/web" ^
-            --collect-all=cpm ^
+          python -m PyInstaller `
+            --clean --noconfirm `
+            --noconsole `
+            --onefile `
+            --name=ChromiumBrowserMigrator `
+            "--add-data=src/cpm/m09_gui/web;cpm/m09_gui/web" `
+            --collect-all=cpm `
+            --hidden-import=cpm `
+            --hidden-import=cpm.m09_gui `
+            --hidden-import=cpm.m09_gui.app `
             src/cpm/m09_gui/app.py
 
       - name: Upload Windows artifact
