@@ -1,3 +1,5 @@
+import hashlib
+import json
 from typing import Dict, Any, List
 from cpm.m04_transformer.base import BaseBrowserAdapter
 from cpm.core.dataclasses import BookmarkItem
@@ -24,9 +26,14 @@ class ChromiumBookmarksMixin:
         roots = raw_bookmarks.get("roots", {})
         result = []
         for root_key, root_node in roots.items():
-            # root_key typically: bookmark_bar, other, synced
             if isinstance(root_node, dict):
-                result.append(self._parse_bookmark_node(root_node))
+                # Preserve original root key as the bookmark item id so export
+                # can reconstruct the correct Chromium root structure.
+                node_with_key = dict(root_node)
+                node_with_key.setdefault("_root_key", root_key)
+                item = self._parse_bookmark_node(node_with_key)
+                item.id = root_key  # use root_key as id to survive round-trip
+                result.append(item)
         return result
 
     def _export_bookmark_node(self, item: BookmarkItem) -> Dict[str, Any]:
@@ -37,27 +44,30 @@ class ChromiumBookmarksMixin:
         }
         if item.url:
             node["url"] = item.url
-
         if item.children:
             node["children"] = [self._export_bookmark_node(child) for child in item.children]
-
         return node
 
     def export_bookmarks(self, standardized_bookmarks: List[BookmarkItem]) -> Dict[str, Any]:
-        roots = {}
+        roots: Dict[str, Any] = {}
         for item in standardized_bookmarks:
-            # We map back based on typical chrome roots or just put everything in bookmark_bar if unknown
-            # For simplicity, if it has a generic name, we map it, else dump into other
-            root_key = "other"
-            name_lower = item.name.lower()
-            if "bar" in name_lower:
-                root_key = "bookmark_bar"
-            elif "sync" in name_lower:
-                root_key = "synced"
-
+            # The item.id was set to the original root_key in transform_bookmarks.
+            # Fall back to heuristic mapping only for bookmarks not created by this tool.
+            root_key = item.id if item.id in ("bookmark_bar", "other", "synced") else "other"
+            if root_key == "other":
+                name_lower = item.name.lower()
+                if "bar" in name_lower or "toolbar" in name_lower:
+                    root_key = "bookmark_bar"
+                elif "sync" in name_lower or "mobile" in name_lower:
+                    root_key = "synced"
             roots[root_key] = self._export_bookmark_node(item)
 
-        return {"version": 1, "checksum": "placeholder", "roots": roots}
+        # Chromium validates a checksum of the roots object on load. Compute an
+        # MD5 over the canonical JSON so Chrome accepts the file without warnings.
+        roots_json = json.dumps(roots, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        checksum = hashlib.md5(roots_json.encode("utf-8")).hexdigest()
+
+        return {"version": 1, "checksum": checksum, "roots": roots}
 
 
 class ChromeAdapter(ChromiumBookmarksMixin, BaseBrowserAdapter):

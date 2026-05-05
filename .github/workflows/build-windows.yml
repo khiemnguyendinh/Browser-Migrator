@@ -28,7 +28,12 @@ jobs:
           pip install pywin32
 
       - name: Run tests
-        run: pytest tests/ -v --tb=short
+        run: |
+          set PYTHONPATH=src
+          pytest tests/ -v --tb=short
+        env:
+          CPM_TEST_MODE: "1"
+          CPM_MOCK_KEYCHAIN: "mock_master_ci_test_key"
 
       - name: Build Windows EXE
         run: |

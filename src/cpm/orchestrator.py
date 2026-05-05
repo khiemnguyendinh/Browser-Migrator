@@ -53,8 +53,8 @@ class MigrationOrchestrator:
         try:
             # 2. Get Crypto Contexts
             cpm_logger.info("Acquiring cryptography contexts...")
-            source_ctx = get_crypto_context(source_id)
-            target_ctx = get_crypto_context(target_id)
+            source_ctx = get_crypto_context(source_id, source_path)
+            target_ctx = get_crypto_context(target_id, target_path)
 
             # 3. Read Source Profile
             cpm_logger.info("Reading source profile...")
