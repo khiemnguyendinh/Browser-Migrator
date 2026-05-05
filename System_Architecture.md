@@ -1,71 +1,77 @@
 # System Architecture
 
 ## 1. Architecture Overview
-
-CPM follows a **Layered Modular Architecture** với 8 modules độc lập, giao tiếp qua well-defined interfaces.
+CPM follows a **Multi-Platform Layered Modular Architecture**. It uses a **Factory Pattern** to abstract OS-specific differences between macOS and Windows.
 
 ```
 ┌─────────────────────────────────────────────────┐
 │            M06: CLI Interface (Click)           │
+│            M09: GUI Interface (pywebview)       │
 │       (User Input / Output / Progress)          │
 └────────────────┬────────────────────────────────┘
-                 │
+                  │
 ┌────────────────▼────────────────────────────────┐
 │         Orchestrator (Migration Engine)         │
 │   (Phối hợp các modules, transaction control)   │
 └──┬──────┬──────┬──────┬──────┬──────┬──────────┘
-   │      │      │      │      │      │
-┌──▼──┐ ┌─▼──┐ ┌─▼──┐ ┌─▼──┐ ┌─▼──┐ ┌─▼──┐
-│ M01 │ │M02 │ │M03 │ │M04 │ │M05 │ │M07 │
-└─────┘ └────┘ └────┘ └────┘ └────┘ └────┘
-                                      │
-                              ┌───────▼────────┐
-                              │  M08: Logger   │
-                              └────────────────┘
+    │      │      │      │      │      │
+    ▼      ▼      ▼      ▼      ▼      ▼
+   M01    M02    M03    M04    M05    M07
+ (Detect)(Read) (Key) (Trans)(Write)(Backup)
+                                       │
+                               ┌───────▼────────┐
+                               │  M08: Logger   │
+                               └────────────────┘
 ```
 
-## 2. Module Responsibilities
+## 2. Platform Abstraction Layer
+To support both macOS and Windows, each core module is split into:
+- **Base Class**: Defines the interface.
+- **Platform Implementation**: Logic specific to `darwin` (macOS) or `windows`.
+- **Factory**: Instantiates the correct implementation based on `src/cpm/core/platform.py`.
+
+## 3. Module Responsibilities
 
 ### M01 — Browser Detector
-- Scan macOS để tìm các Chromium browser đã cài.
-- Đường dẫn chuẩn: `~/Library/Application Support/{BrowserName}/`.
-- Output: `BrowserInfo` object với metadata.
+- **macOS**: Scans `~/Library/Application Support`.
+- **Windows**: Scans `%LocalAppData%`.
+- Output: `BrowserInfo` object.
 
 ### M02 — Profile Reader
-- Đọc profile data từ browser nguồn.
-- Parse SQLite databases (History, Login Data, Cookies, Web Data).
-- Parse JSON files (Bookmarks, Preferences, Local State).
-- Output: `ProfileSnapshot` object (in-memory representation).
+- Reads profile data (SQLite, JSON).
+- Uses `CAST(encrypted_value AS BLOB)` to avoid UTF-8 decoding errors across platforms.
+- Output: `ProfileSnapshot` object.
 
 ### M03 — Keychain Decryptor (Most Critical)
-- Lấy encryption key từ macOS Keychain qua `security` CLI hoặc `keyring` lib.
-- Decrypt cookies và passwords blob (AES-128-CBC trên macOS).
-- Yêu cầu user authentication (Touch ID / password).
+- **macOS**: Uses `security` CLI to retrieve master keys from Keychain.
+- **Windows**: Uses `DPAPI` (CryptUnprotectData) to decrypt master keys.
 
 ### M04 — Data Transformer
-- Adapter pattern: chuyển đổi format giữa các browser versions.
-- Xử lý edge cases (Brave's BAT data, Cốc Cốc's custom fields).
-- Validate data integrity.
+- Adapter pattern: normalize data between browser versions.
+- Support for Edge, Brave, CocCoc, Comet.
 
 ### M05 — Profile Writer
-- Encrypt lại data với key của browser đích.
-- Ghi vào SQLite + JSON files của browser đích.
-- Atomic writes: dùng temp file + rename.
+- Ghi data vào browser đích.
+- Xử lý các ràng buộc NOT NULL (signon_realm, blacklisted_//user, scheme) để đảm bảo tương thích DB.
+- Atomic writes: temp file + rename.
 
 ### M06 — CLI Interface
 - Built on Click framework.
-- Interactive prompts, progress bars (rich/tqdm).
-- Subcommands: list, inspect, migrate, history, rollback, cleanup, doctor.
 
 ### M07 — Backup & Rollback
-- Tar.gz toàn bộ profile folder trước khi ghi.
-- Lưu vào `~/CPM_Backups/{timestamp}/`.
-- Restore: untar + replace.
+- **macOS**: Uses `tar.gz` archives.
+- **Windows**: Uses `.zip` archives.
+- Restore: extract + replace.
 
 ### M08 — Logger & Telemetry
-- Structured logging (JSON format).
-- Sanitize sensitive data trước khi log.
-- Phase A: log local. Phase C: optional anonymous telemetry.
+- Structured logging (JSON).
+- Sanitize sensitive data.
+
+### M09 — GUI Interface
+- Pywebview-based UI (HTML/CSS/JS).
+- 3-Page flow: Scan $\rightarrow$ Configuration $\rightarrow$ Status.
+
+
 
 ## 3. Data Flow — Migration Process
 

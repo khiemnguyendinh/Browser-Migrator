@@ -73,19 +73,26 @@ class ChromiumWriter(BaseProfileWriter):
     def write_cookies(self, cookies: list) -> bool:
         if not cookies:
             return True
-
+        
         cookie_path = self.target_profile_path / "Network" / "Cookies"
         if not cookie_path.parent.exists():
             cookie_path.parent.mkdir(parents=True, exist_ok=True)
-            # In older versions, it might just be "Cookies"
-
-        # We use INSERT OR REPLACE to avoid primary key conflicts
+        
+        # Ensure the table exists if we are creating a new DB
+        setup_sql = """
+        CREATE TABLE IF NOT EXISTS cookies (
+            host_key TEXT, name TEXT, encrypted_value BLOB, path TEXT, 
+            expires_utc INTEGER, is_secure INTEGER, is_httponly INTEGER, 
+            has_expires INTEGER, is_persistent INTEGER, samesite INTEGER
+        );
+        """
+        
         insert_sql = """
             INSERT OR REPLACE INTO cookies 
             (host_key, name, encrypted_value, path, expires_utc, is_secure, is_httponly, has_expires, is_persistent, samesite)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
-
+        
         data = [
             (
                 c.host_key,
@@ -101,9 +108,9 @@ class ChromiumWriter(BaseProfileWriter):
             )
             for c in cookies
         ]
-
+        
         try:
-            self._execute_atomic_sql_write(cookie_path, "", insert_sql, data)
+            self._execute_atomic_sql_write(cookie_path, setup_sql, insert_sql, data)
             return True
         except Exception:
             return False
@@ -111,15 +118,15 @@ class ChromiumWriter(BaseProfileWriter):
     def write_passwords(self, passwords: list) -> bool:
         if not passwords:
             return True
-
+        
         login_data_path = self.target_profile_path / "Login Data"
-
+        
         insert_sql = """
             INSERT OR REPLACE INTO logins 
-            (origin_url, action_url, username_element, username_value, password_element, password_value, date_created, times_used)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (origin_url, action_url, username_element, username_value, password_element, password_value, date_created, times_used, signon_realm, blacklisted_by_user, scheme)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
-
+        
         data = [
             (
                 p.origin_url,
@@ -130,10 +137,13 @@ class ChromiumWriter(BaseProfileWriter):
                 p.encrypted_password,
                 p.date_created,
                 p.times_used,
+                p.origin_url, # signon_realm
+                0, # blacklisted_by_user default
+                "password", # scheme
             )
             for p in passwords
         ]
-
+        
         try:
             self._execute_atomic_sql_write(login_data_path, "", insert_sql, data)
             return True

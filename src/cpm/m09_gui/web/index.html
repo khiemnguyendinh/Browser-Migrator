@@ -17,80 +17,109 @@
     <div class="app-container">
         <header>
             <h1>Chromium Browser <span>Migrator</span></h1>
-            <p>Seamlessly transfer your browsing life.</p>
+            <div class="header-actions" style="display: flex; align-items: center; gap: 10px;">
+                <p style="margin: 0; font-size: 0.9rem; opacity: 0.8;">Seamlessly transfer your browsing life.</p>
+            </div>
         </header>
 
         <main>
-            <div class="glass-card selection-area">
-                <div class="browser-select">
-                    <label for="source-browser">Source Browser</label>
-                    <div class="select-wrapper">
-                        <select id="source-browser" disabled>
-                            <option value="">Scanning browsers...</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="transfer-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
-                </div>
-
-                <div class="browser-select">
-                    <label for="target-browser">Target Browser</label>
-                    <div class="select-wrapper">
-                        <select id="target-browser" disabled>
-                            <option value="">Scanning browsers...</option>
-                        </select>
-                    </div>
+            <!-- PAGE 1: SCAN -->
+            <div id="page-scan" class="page active">
+                <div class="glass-card center-card" style="text-align: center; padding: 60px 40px;">
+                    <h2 style="margin-bottom: 16px; font-size: 1.8rem;">Ready to Migrate?</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 1.1rem;">Click the button below to scan your Mac for installed Chromium browsers.</p>
+                    <div id="scan-error" class="error-message hidden" style="color: #fca5a5; margin-bottom: 20px; font-size: 0.9rem; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2);"></div>
+                    <button id="btn-scan" class="primary-btn glass-btn" style="max-width: 300px; margin: 0 auto;">
+                        <span class="btn-text">Scan Browsers</span>
+                        <div class="loader hidden"></div>
+                    </button>
                 </div>
             </div>
 
-            <div class="glass-card options-area">
-                <h3>Select Data to Migrate</h3>
-                <div class="options-grid">
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="opt-passwords" checked>
-                        <span class="slider"></span>
-                        <span class="label-text">Passwords</span>
-                    </label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="opt-cookies" checked>
-                        <span class="slider"></span>
-                        <span class="label-text">Cookies</span>
-                    </label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="opt-bookmarks" checked>
-                        <span class="slider"></span>
-                        <span class="label-text">Bookmarks</span>
-                    </label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="opt-history" checked>
-                        <span class="slider"></span>
-                        <span class="label-text">History</span>
-                    </label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="opt-autofill" checked>
-                        <span class="slider"></span>
-                        <span class="label-text">Auto Fill</span>
-                    </label>
-                    <label class="toggle-switch disabled">
-                        <input type="checkbox" id="opt-extensions" disabled>
-                        <span class="slider" style="background-color: rgba(239, 68, 68, 0.2);"></span>
-                        <span class="label-text" style="opacity: 0.7;">Extensions <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;">Unsafe</span></span>
-                    </label>
+            <!-- PAGE 2: MIGRATION -->
+            <div id="page-migration" class="page hidden">
+                <div class="glass-card selection-area">
+                    <div class="browser-select">
+                        <label for="source-browser">Source Browser</label>
+                        <div class="select-wrapper">
+                            <select id="source-browser"></select>
+                        </div>
+                        <label for="source-profile" style="margin-top: 10px;">Source Profile</label>
+                        <div class="select-wrapper">
+                            <select id="source-profile" disabled><option>Select Browser First</option></select>
+                        </div>
+                    </div>
+
+                    <div class="transfer-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+
+                    <div class="browser-select">
+                        <label for="target-browser">Target Browser</label>
+                        <div class="select-wrapper">
+                            <select id="target-browser"></select>
+                        </div>
+                        <label for="target-profile" style="margin-top: 10px;">Target Profile</label>
+                        <div class="select-wrapper">
+                            <select id="target-profile" disabled><option>Select Browser First</option></select>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="glass-card options-area">
+                    <h3>Select Data to Migrate</h3>
+                    <div class="options-grid">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="opt-passwords" checked>
+                            <span class="slider"></span>
+                            <span class="label-text">Passwords</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="opt-cookies" checked>
+                            <span class="slider"></span>
+                            <span class="label-text">Cookies</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="opt-bookmarks" checked>
+                            <span class="slider"></span>
+                            <span class="label-text">Bookmarks</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="opt-history" checked>
+                            <span class="slider"></span>
+                            <span class="label-text">History</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="opt-autofill" checked>
+                            <span class="slider"></span>
+                            <span class="label-text">Auto Fill</span>
+                        </label>
+                        <label class="toggle-switch disabled">
+                            <input type="checkbox" id="opt-extensions" disabled>
+                            <span class="slider" style="background-color: rgba(239, 68, 68, 0.2);"></span>
+                            <span class="label-text" style="opacity: 0.7;">Extensions <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;">Unsafe</span></span>
+                        </label>
+                    </div>
+                </div>
+
+                <button id="migrate-btn" class="primary-btn glass-btn" disabled>
+                    <span class="btn-text">Start Migration</span>
+                </button>
             </div>
 
-            <button id="migrate-btn" class="primary-btn glass-btn" disabled>
-                <span class="btn-text">Start Migration</span>
-                <div class="loader hidden"></div>
-            </button>
-
-            <div id="status-console" class="glass-card status-console hidden">
-                <h3>Migration Status</h3>
-                <div id="log-messages" class="log-messages"></div>
+            <!-- PAGE 3: STATUS -->
+            <div id="page-status" class="page hidden">
+                <div id="status-console" class="glass-card status-console" style="height: 350px;">
+                    <h3>Migration Status</h3>
+                    <div id="log-messages" class="log-messages"></div>
+                </div>
+                
+                <div class="action-buttons" style="display: flex; gap: 16px; margin-top: 24px;">
+                    <button id="btn-retry" class="secondary-btn glass-btn" style="background: rgba(255,255,255,0.1);">Làm lại</button>
+                    <button id="btn-exit" class="primary-btn glass-btn">Thoát</button>
+                </div>
             </div>
         </main>
 

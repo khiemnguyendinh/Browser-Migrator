@@ -92,11 +92,15 @@ class MigrationOrchestrator:
             import shutil
 
             if options.get("history", True):
-                cpm_logger.info("Migrating History...")
-                src_history = source_path / "History"
-                tgt_history = target_path / "History"
-                if src_history.exists():
-                    shutil.copy2(src_history, tgt_history)
+                cpm_logger.info("Migrating History and Autocomplete data...")
+                for file_name in ["History", "Shortcuts", "Top Sites"]:
+                    src_file = source_path / file_name
+                    tgt_file = target_path / file_name
+                    if src_file.exists():
+                        try:
+                            shutil.copy2(src_file, tgt_file)
+                        except Exception as e:
+                            cpm_logger.error(f"Failed to copy {file_name}: {e}")
 
             if options.get("autofill", True):
                 cpm_logger.info("Migrating Auto Fill (Web Data)...")

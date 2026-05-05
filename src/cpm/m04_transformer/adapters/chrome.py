@@ -3,10 +3,8 @@ from cpm.m04_transformer.base import BaseBrowserAdapter
 from cpm.core.dataclasses import BookmarkItem
 
 
-class ChromeAdapter(BaseBrowserAdapter):
-    @property
-    def browser_id(self) -> str:
-        return "chrome"
+class ChromiumBookmarksMixin:
+    """Shared bookmark parsing/export logic for all Chromium-based browsers."""
 
     def _parse_bookmark_node(self, node: Dict[str, Any]) -> BookmarkItem:
         item = BookmarkItem(
@@ -60,3 +58,9 @@ class ChromeAdapter(BaseBrowserAdapter):
             roots[root_key] = self._export_bookmark_node(item)
 
         return {"version": 1, "checksum": "placeholder", "roots": roots}
+
+
+class ChromeAdapter(ChromiumBookmarksMixin, BaseBrowserAdapter):
+    @property
+    def browser_id(self) -> str:
+        return "chrome"

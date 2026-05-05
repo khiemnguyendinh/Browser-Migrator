@@ -80,15 +80,19 @@ def _derive_aes_key(master: bytes) -> bytes:
 
 def get_crypto_context(browser_id: str) -> CryptoContext:
     """Fetch master key from Keychain, derive AES key."""
-    master = _get_master_key(browser_id)
-    aes_key = _derive_aes_key(master)
+    master_bytes = _get_master_key(browser_id)
+    # Convert to mutable bytearray so we can zero it after use
+    master = bytearray(master_bytes)
+    del master_bytes
 
-    # Try to clear master key from memory
-    if isinstance(master, bytearray):
+    try:
+        aes_key = _derive_aes_key(bytes(master))
+        return CryptoContext(browser_id=browser_id, _aes_key=aes_key)
+    finally:
+        # Zero out master key from memory
         for i in range(len(master)):
             master[i] = 0
-
-    return CryptoContext(browser_id=browser_id, _aes_key=aes_key)
+        del master
 
 
 def decrypt_value(encrypted: bytes, ctx: CryptoContext) -> bytes:

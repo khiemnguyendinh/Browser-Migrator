@@ -50,20 +50,34 @@ class ChromiumReader(BaseProfileReader):
 
         temp_db = self._copy_db_to_temp(cookie_path)
         cookies = []
+        conn = None
         try:
             conn = sqlite3.connect(f"file:{temp_db}?mode=ro", uri=True)
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
 
-            # Chromium Cookie schema: host_key, name, value, path, expires_utc, is_secure, is_httponly, samesite, encrypted_value...
-            cursor.execute("SELECT * FROM cookies")
+            # Use explicit column names and CAST encrypted_value to BLOB to avoid UTF-8 decoding issues
+            cursor.execute("SELECT host_key, name, CAST(encrypted_value AS BLOB), path, expires_utc, is_secure, is_httponly, samesite, has_expires, is_persistent FROM cookies")
             for row in cursor.fetchall():
-                cookies.append(self.adapter.transform_cookie(dict(row)))
+                row_dict = {
+                    "host_key": row[0],
+                    "name": row[1],
+                    "encrypted_value": row[2],
+                    "path": row[3],
+                    "expires_utc": row[4],
+                    "is_secure": row[5],
+                    "is_httponly": row[6],
+                    "samesite": row[7],
+                    "has_expires": row[8],
+                    "is_persistent": row[9],
+                }
+                cookies.append(self.adapter.transform_cookie(row_dict))
 
         except Exception as e:
             cpm_logger.error(f"Error reading cookies: {e}")
         finally:
-            conn.close()
+            if conn:
+                conn.close()
             shutil.rmtree(temp_db.parent, ignore_errors=True)
 
         return cookies
@@ -76,6 +90,7 @@ class ChromiumReader(BaseProfileReader):
 
         temp_db = self._copy_db_to_temp(login_data_path)
         passwords = []
+        conn = None
         try:
             conn = sqlite3.connect(f"file:{temp_db}?mode=ro", uri=True)
             conn.row_factory = sqlite3.Row
@@ -88,7 +103,8 @@ class ChromiumReader(BaseProfileReader):
         except Exception as e:
             cpm_logger.error(f"Error reading passwords: {e}")
         finally:
-            conn.close()
+            if conn:
+                conn.close()
             shutil.rmtree(temp_db.parent, ignore_errors=True)
 
         return passwords

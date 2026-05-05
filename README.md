@@ -1,68 +1,63 @@
-# Chromium Profile Migrator (CPM)
+# Chromium Browser Migrator (CPM)
 
-**Project Codename:** CPM
-**Owner:** Khiêm
-**Strategy:** Phase A (CLI MVP) → Phase C (Open-Source GUI Utility)
-**Tech Stack Phase A:** Python 3.11+ / Click / SQLAlchemy / pytest
-**Target Platform:** macOS 12+ (Apple Silicon + Intel)
-**Last Updated:** 2026-05-01
+**Chromium Browser Migrator (CPM)** is a powerful, secure, and seamless utility for users to transfer their browsing data between different Chromium-based browsers across **macOS and Windows**.
 
-## Cấu trúc thư mục dự án
+## 🌟 Features
 
-```
-CPM/
-├── README.md                          # File này — tổng quan dự án
-├── 01_Business_Analysis/              # Phân tích nghiệp vụ
-│   ├── BRD_Business_Requirements.md
-│   ├── User_Personas_Use_Cases.md
-│   └── Success_Metrics_KPI.md
-├── 02_Technical_Architecture/         # Kiến trúc kỹ thuật
-│   ├── System_Architecture.md
-│   ├── Data_Flow_Diagram.md
-│   └── Security_Threat_Model.md
-├── 03_Work_Breakdown/                 # Phân rã công việc
-│   ├── WBS_Work_Breakdown_Structure.md
-│   ├── Task_Assignment_Matrix.md
-│   └── Timeline_Milestones.md
-├── 04_Module_Specs/                   # Đặc tả từng module
-│   ├── M01_Browser_Detector.md
-│   ├── M02_Profile_Reader.md
-│   ├── M03_Keychain_Decryptor.md
-│   ├── M04_Data_Transformer.md
-│   ├── M05_Profile_Writer.md
-│   ├── M06_CLI_Interface.md
-│   ├── M07_Backup_Rollback.md
-│   └── M08_Logger_Telemetry.md
-├── 05_Coordination/                   # Phối hợp Claude Code + Antigravity
-│   ├── Claude_Code_Brief.md           # Brief cho Claude Code (Tech Lead)
-│   ├── Antigravity_Brief.md           # Brief cho Antigravity (Developer)
-│   ├── Handoff_Protocol.md
-│   └── Code_Review_Checklist.md
-└── 06_Standards/                      # Tiêu chuẩn dự án
-    ├── Coding_Standards.md
-    ├── Git_Workflow.md
-    └── Testing_Strategy.md
+Easily migrate your digital life between **Chrome, Edge, Cốc Cốc, Brave, and Comet** with selective data transfer:
+
+- 🔐 **Passwords**: Securely transfer saved logins.
+- 🍪 **Cookies**: Move session data and preferences.
+- 🔖 **Bookmarks**: Transfer your curated list of sites.
+- 🕒 **History**: Keep your browsing timeline intact.
+- ✍️ **Auto Fill**: Migrate addresses and form data.
+
+## 🛡️ Security First
+
+Your privacy and security are our top priorities:
+
+- **100% Offline**: All decryption and migration processes happen locally on your machine.
+- **Zero Server Interaction**: No data is ever sent to any external server or intermediate cloud.
+- **Native OS Integration**: 
+  - **macOS**: Utilizes the native Local Keychain for secure data decryption.
+  - **Windows**: Utilizes the Windows Data Protection API (DPAPI) for secure decryption.
+- **Safety Net**: Automated backups are created before any write operation, allowing for instant rollback.
+
+## 🚀 Getting Started
+
+### Interfaces
+CPM provides two ways to interact with the tool:
+1. **GUI**: A modern, intuitive interface for a guided migration experience.
+2. **CLI**: A fast, command-line interface for power users.
+
+### Usage (Developer/Manual)
+**Running the GUI:**
+```bash
+# Using the CLI entry point
+cpm gui
 ```
 
-## Quick Start
+**Running the CLI Migration:**
+```bash
+cpm migrate --from <browser_a> --to <browser_b>
+```
 
-1. Đọc `01_Business_Analysis/BRD_Business_Requirements.md` để nắm bối cảnh nghiệp vụ.
-2. Đọc `02_Technical_Architecture/System_Architecture.md` để hiểu kiến trúc tổng thể.
-3. Đọc `03_Work_Breakdown/Task_Assignment_Matrix.md` để biết ai làm gì.
-4. Claude Code đọc `05_Coordination/Claude_Code_Brief.md`.
-5. Antigravity đọc `05_Coordination/Antigravity_Brief.md`.
+## 🛠 Build Instructions
 
-## Phân chia vai trò
+### For macOS (.app)
+```bash
+# Sequence: PyInstaller -> Resource Injection -> Xattr Clean -> Codesign
+python3 -m PyInstaller --clean --noconfirm "Chromium Browser Migrator.spec"
+cp Credits.html "dist/Chromium Browser Migrator.app/Contents/Resources/Credits.html"
+xattr -cr "dist/Chromium Browser Migrator.app"
+codesign --force --deep --sign - "dist/Chromium Browser Migrator.app"
+```
 
-- **Claude Code (Tech Lead — 60% việc khó):** Architecture, core logic, security-critical modules, code review.
-- **Antigravity (Developer — 40% thực thi):** Implementation chi tiết theo spec, unit tests, documentation, CLI polish.
+### For Windows (.exe Portable)
+Run the dedicated build script on a Windows machine:
+```bash
+python windows_build/build_win.py
+```
 
-## Phase A — Mục tiêu MVP (2 tuần)
-
-CLI tool chuyển toàn bộ profile từ Chromium browser A → B trên macOS:
-- Bookmarks, History, Autofill, Extensions list
-- Cookies (giữ nguyên session)
-- Saved Passwords (qua macOS Keychain)
-- Profile preferences
-
-**Success Criteria:** Migrate Chrome → Edge thành công 100%, user đăng nhập lại Gmail/Facebook không cần nhập mật khẩu.
+## 📄 License
+Internal Project - Phase A (MVP)
