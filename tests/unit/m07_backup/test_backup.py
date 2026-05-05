@@ -21,10 +21,13 @@ class TestBackupManager(unittest.TestCase):
         shutil.rmtree(self.test_dir)
 
     def test_create_backup_success(self):
+        import platform as _platform
         backup_path = self.manager.create_backup(str(self.profile_dir))
         self.assertIsNotNone(backup_path)
         self.assertTrue(backup_path.exists())
-        self.assertTrue(backup_path.suffix == ".gz")
+        # macOS creates .tar.gz; Windows creates .zip
+        expected_suffix = ".zip" if _platform.system() == "Windows" else ".gz"
+        self.assertEqual(backup_path.suffix, expected_suffix)
 
     def test_create_backup_nonexistent_path(self):
         backup_path = self.manager.create_backup(str(self.test_dir / "nonexistent"))

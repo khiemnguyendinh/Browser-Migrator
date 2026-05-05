@@ -154,7 +154,24 @@ def get_crypto_context(
     """
     Acquire OS-specific encryption key for the given browser and return a
     CryptoContext. On Windows, profile_path is required to locate Local State.
+
+    In test mode (pytest running or CPM_TEST_MODE=1), CPM_MOCK_KEYCHAIN bypasses
+    OS key acquisition entirely so tests never touch the real keychain.
     """
+    # Check mock mode BEFORE platform detection so tests work on any OS.
+    _is_test = "pytest" in sys.modules or os.environ.get("CPM_TEST_MODE") == "1"
+    mock_val = os.environ.get("CPM_MOCK_KEYCHAIN")
+    if mock_val and _is_test:
+        master = bytearray(mock_val.encode("utf-8"))
+        try:
+            aes_key = _derive_aes_key_macos(master)
+            # Use "macos" AES-CBC algorithm for mock contexts regardless of OS,
+            # so test encrypt/decrypt round-trips are self-consistent.
+            return CryptoContext(browser_id=browser_id, _aes_key=aes_key, _platform="macos")
+        finally:
+            for i in range(len(master)):
+                master[i] = 0
+
     current_os = platform.system()
 
     if current_os == "Darwin":
