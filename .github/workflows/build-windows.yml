@@ -7,6 +7,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build-windows:
     runs-on: windows-latest
@@ -18,17 +21,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: "pip"
 
-      - name: Install dependencies
+      - name: Install runtime dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ".[dev]"
-          pip install pywin32
+          pip install click rich cryptography "pywebview>=5.0.0" pywin32
+          Write-Host "Runtime deps installed OK"
+
+      - name: Install build and test tools
+        run: |
+          pip install "pyinstaller>=6.3.0" pytest pytest-cov
+          Write-Host "Build tools installed OK"
 
       - name: Run tests
         run: |
@@ -43,18 +51,28 @@ jobs:
           python -m PyInstaller `
             --clean --noconfirm `
             --noconsole `
-            --onefile `
+            --onedir `
             --name=ChromiumBrowserMigrator `
             "--add-data=src/cpm/m09_gui/web;cpm/m09_gui/web" `
             --collect-all=cpm `
-            --hidden-import=cpm `
-            --hidden-import=cpm.m09_gui `
-            --hidden-import=cpm.m09_gui.app `
+            --collect-all=webview `
+            --hidden-import=webview `
+            --hidden-import=webview.platforms.edgechromium `
+            --hidden-import=webview.platforms.winforms `
             src/cpm/m09_gui/app.py
+          Write-Host "PyInstaller build completed"
+          Get-ChildItem dist\ChromiumBrowserMigrator\ | Select-Object Name, Length
+
+      - name: Package into ZIP
+        run: |
+          Compress-Archive `
+            -Path dist\ChromiumBrowserMigrator\* `
+            -DestinationPath dist\ChromiumBrowserMigrator-Windows.zip
+          Write-Host "ZIP created"
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
           name: ChromiumBrowserMigrator-Windows
-          path: dist/ChromiumBrowserMigrator.exe
+          path: dist/ChromiumBrowserMigrator-Windows.zip
           retention-days: 30
